@@ -1,0 +1,395 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.46689385,
+          -33.95391433
+        ]
+      },
+      "properties": {
+        "image": "000070_20251015-165908-659_annot.jpg",
+        "conf": 0.5515,
+        "x1": 401.9,
+        "y1": 581.2,
+        "x2": 536.3,
+        "y2": 633,
+        "w": 1280,
+        "h": 720,
+        "area_px": 6953.2,
+        "area_norm": 0.007545,
+        "alt": 44.2,
+        "spd": 0,
+        "weather": 18,
+        "time": "16:59:08"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.46689265,
+          -33.95391642
+        ]
+      },
+      "properties": {
+        "image": "000092_20251015-165936-801_annot.jpg",
+        "conf": 0.5501,
+        "x1": 3.9,
+        "y1": 518.6,
+        "x2": 292.3,
+        "y2": 639.6,
+        "w": 1280,
+        "h": 720,
+        "area_px": 34889.7,
+        "area_norm": 0.037858,
+        "alt": 44.3,
+        "spd": 0,
+        "weather": 18,
+        "time": "16:59:36"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.46689255,
+          -33.95391695
+        ]
+      },
+      "properties": {
+        "image": "000094_20251015-165940-131_annot.jpg",
+        "conf": 0.6234,
+        "x1": 927.5,
+        "y1": 586.5,
+        "x2": 1277.8,
+        "y2": 714,
+        "w": 1280,
+        "h": 720,
+        "area_px": 44679.4,
+        "area_norm": 0.04848,
+        "alt": 44.3,
+        "spd": 0,
+        "weather": 18,
+        "time": "16:59:40"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.469314333333333,
+          -33.95152797
+        ]
+      },
+      "properties": {
+        "image": "000179_20251015-171000-388_annot.jpg",
+        "conf": 0.6258,
+        "x1": 787.2,
+        "y1": 559.4,
+        "x2": 935.9,
+        "y2": 608.2,
+        "w": 1280,
+        "h": 720,
+        "area_px": 7254.1,
+        "area_norm": 0.007871,
+        "alt": 25.8,
+        "spd": 0,
+        "weather": 18,
+        "time": "17:10:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.4692853,
+          -33.9544419
+        ]
+      },
+      "properties": {
+        "image": "000082_20251015-171723-023_annot.jpg",
+        "conf": 0.6007,
+        "x1": 974.9,
+        "y1": 571,
+        "x2": 1201.5,
+        "y2": 666.2,
+        "w": 1280,
+        "h": 720,
+        "area_px": 21582.7,
+        "area_norm": 0.023419,
+        "alt": 18.4,
+        "spd": 0,
+        "weather": 18,
+        "time": "17:17:23"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.469285983333332,
+          -33.95444202
+        ]
+      },
+      "properties": {
+        "image": "000102_20251015-171740-859_annot.jpg",
+        "conf": 0.6063,
+        "x1": 479.4,
+        "y1": 581.5,
+        "x2": 629.7,
+        "y2": 630.2,
+        "w": 1280,
+        "h": 720,
+        "area_px": 7316.1,
+        "area_norm": 0.007939,
+        "alt": 18.4,
+        "spd": 0,
+        "weather": 18,
+        "time": "17:17:40"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.469286433333334,
+          -33.9544421
+        ]
+      },
+      "properties": {
+        "image": "000110_20251015-171754-574_annot.jpg",
+        "conf": 0.6392,
+        "x1": 431.6,
+        "y1": 630.6,
+        "x2": 614,
+        "y2": 714.2,
+        "w": 1280,
+        "h": 720,
+        "area_px": 15268.5,
+        "area_norm": 0.016567,
+        "alt": 18.4,
+        "spd": 0,
+        "weather": 18,
+        "time": "17:17:54"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.460487283333332,
+          -33.96055472
+        ]
+      },
+      "properties": {
+        "image": "000090_20251015-172700-345_annot.jpg",
+        "conf": 0.6161,
+        "x1": 431.5,
+        "y1": 637.4,
+        "x2": 597.3,
+        "y2": 707.4,
+        "w": 1280,
+        "h": 720,
+        "area_px": 11600.7,
+        "area_norm": 0.012588,
+        "alt": 98.4,
+        "spd": 0,
+        "weather": 18,
+        "time": "17:27:00"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.459977066666667,
+          -33.96197452
+        ]
+      },
+      "properties": {
+        "image": "000080_20251015-173258-887_annot.jpg",
+        "conf": 0.6495,
+        "x1": 636.5,
+        "y1": 515.2,
+        "x2": 782.8,
+        "y2": 547,
+        "w": 1280,
+        "h": 720,
+        "area_px": 4656.3,
+        "area_norm": 0.005052,
+        "alt": 83.3,
+        "spd": 0,
+        "weather": 18,
+        "time": "17:32:58"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.462229916666665,
+          -33.95810383
+        ]
+      },
+      "properties": {
+        "image": "000305_20251015-200816-453_annot.jpg",
+        "conf": 0.5632,
+        "x1": 153.8,
+        "y1": 101.9,
+        "x2": 832.3,
+        "y2": 471.7,
+        "w": 1280,
+        "h": 720,
+        "area_px": 250998.8,
+        "area_norm": 0.272351,
+        "alt": 93.8,
+        "spd": 0,
+        "weather": 15,
+        "time": "20:08:16"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.459362283333334,
+          -33.96036332
+        ]
+      },
+      "properties": {
+        "image": "000018_20251015-155908-660_annot.jpg",
+        "conf": 0.5627,
+        "x1": 268.6,
+        "y1": 384.3,
+        "x2": 817.3,
+        "y2": 574.3,
+        "w": 1280,
+        "h": 720,
+        "area_px": 104259.9,
+        "area_norm": 0.113129,
+        "alt": 97.4,
+        "spd": 0,
+        "weather": 22,
+        "time": "15:59:08"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.459362283333334,
+          -33.96036332
+        ]
+      },
+      "properties": {
+        "image": "000003_20251015-155908-659_annot.jpg",
+        "conf": 0.6102,
+        "x1": 699.4,
+        "y1": 284.4,
+        "x2": 969.6,
+        "y2": 366,
+        "w": 1280,
+        "h": 720,
+        "area_px": 22052.5,
+        "area_norm": 0.113129,
+        "alt": 98.4,
+        "spd": 0,
+        "weather": 22,
+        "time": "15:59:08"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.459362283333334,
+          -33.96036332
+        ]
+      },
+      "properties": {
+        "image": "000021_20251015-160208-660_annot.jpg",
+        "conf": 0.575,
+        "x1": 567.4,
+        "y1": 267.1,
+        "x2": 703.6,
+        "y2": 366.5,
+        "w": 1280,
+        "h": 720,
+        "area_px": 13533,
+        "area_norm": 0.113129,
+        "alt": 99.4,
+        "spd": 0,
+        "weather": 22,
+        "time": "16:02:08"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.459362283333334,
+          -33.96036332
+        ]
+      },
+      "properties": {
+        "image": "000029_20251015-160902-660_annot.jpg",
+        "conf": 0.5934,
+        "x1": 598.7,
+        "y1": 234.4,
+        "x2": 716.6,
+        "y2": 332.4,
+        "w": 1280,
+        "h": 720,
+        "area_px": 11555.6,
+        "area_norm": 0.113129,
+        "alt": 100.4,
+        "spd": 0,
+        "weather": 22,
+        "time": "16:09:02"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.459362283333334,
+          -33.96036332
+        ]
+      },
+      "properties": {
+        "image": "000024_20251015-160902-660_annot.jpg",
+        "conf": 0.5714,
+        "x1": 953.6,
+        "y1": 471.8,
+        "x2": 1278.8,
+        "y2": 720,
+        "w": 1280,
+        "h": 720,
+        "area_px": 80729.1,
+        "area_norm": 0.113129,
+        "alt": 101.4,
+        "spd": 0,
+        "weather": 22,
+        "time": "16:09:02"
+      }
+    }
+  ]
+}
