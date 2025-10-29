@@ -5,11 +5,11 @@
   <title>Pothole Detections Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
   <style>
@@ -21,9 +21,9 @@
     .map-wrap{ height:100%; border:2px solid var(--border); border-radius:12px; overflow:hidden; background:#fff; }
     #map{ height:100%; width:100%; }
     button, select, label { font-size:14px; }
-    .thumb { max-width:360px; width:100%; height:auto; display:block; border-radius:6px; }
-    .meta { margin-top:6px; font-size:12px; color:#333; }
-    .meta b { font-weight:600; }
+    .thumb { max-width:420px; width:100%; height:auto; display:block; border-radius:10px; }
+    .meta { margin-top:8px; font-size:14px; color:#222; line-height:1.35; }
+    .meta b { font-weight:700; }
     .legend { background:#fff; padding:8px 10px; border-radius:8px; box-shadow:0 1px 6px rgba(0,0,0,.15); font-size:12px; }
     .legend .row { display:flex; align-items:center; gap:8px; margin:4px 0; }
     .legend .sw { width:14px; height:14px; border-radius:50%; border:1px solid #3333; }
@@ -51,128 +51,102 @@
   </div>
 
   <script>
-    // ===== CONFIG =====
-    const PX2CM = 0.35;
-    const DEFAULT_WEATHER = "Clear";
-    // Keep images in the SAME folder as index.html by default:
-    const IMAGE_ROOT = "./";
+    // ----------- CONFIG ----------- 
+    const PX2CM = 0.35;                 // pixel -> centimetre scale
+    const DEFAULT_WEATHER_DESC = "Clear";
+    const DEFAULT_TEMP_C = null;        // if you want a fallback temp, put a number e.g. 18
+    const IMAGE_ROOT = "./";            // images are in the same folder
 
-    // ===== TIME HELPERS =====
-    // More permissive pattern: accepts separators and no trailing underscore.
-    const FLEX_TS_RE = /(?:^|[_\/-])(\d{8})[-_]?(\d{6})(?:[-_](\d{3}))?(?:[_\.]|$)/;
-
-    function parseAnyTime(val){
-      if (!val) return null;
-
-      // If number-like → epoch (ms or s)
-      if (/^\d{10,13}$/.test(String(val))) {
-        const n = Number(val);
-        const ms = (String(val).length === 13) ? n : n*1000;
-        const d = new Date(ms);
-        return isNaN(d.getTime()) ? null : d;
-      }
-
-      // ISO or ISO-ish
-      if (typeof val === 'string') {
-        // Try native
-        let d = new Date(val);
-        if (!isNaN(d.getTime())) return d;
-
-        // If looks like "YYYY-MM-DDTHH:mm:ss.sss" but browser is fussy, add Z (UTC)
-        if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(val)) {
-          d = new Date(val + 'Z');
-          if (!isNaN(d.getTime())) return d;
-        }
-
-        // Try compact filename pattern: 20251015-171000(-388)
-        const m = FLEX_TS_RE.exec(val);
-        if (m) {
-          const y = m[1].slice(0,4), M = m[1].slice(4,6), D = m[1].slice(6,8);
-          const hh = m[2].slice(0,2), mm = m[2].slice(2,4), ss = m[2].slice(4,6);
-          const ms = m[3] ? m[3].padEnd(3,'0') : '000';
-          // Build an ISO-UTC string to avoid locale quirks
-          const isoUTC = `${y}-${M}-${D}T${hh}:${mm}:${ss}.${ms}Z`;
-          d = new Date(isoUTC);
-          if (!isNaN(d.getTime())) return d;
-        }
-      }
-
-      return null;
+    // ----------- Helpers -----------
+    function colorForDiameter(cm){
+      if (cm >= 60) return "#e53935";
+      if (cm >= 30) return "#fb8c00";
+      return "#43a047";
+    }
+    function diameterFromAreaPx(areaPx, px2cm=PX2CM){
+      if (!areaPx || areaPx<=0) return null;
+      const d_px = 2*Math.sqrt(areaPx/Math.PI);
+      return +(d_px*px2cm).toFixed(1);
     }
 
-    function timeFromProps(p){
-      // Priority: explicit fields if present
-      const candidates = [p.time, p.timestamp, p.date, p.datetime, p.image, p.image_url];
-      for (const c of candidates) {
-        const d = parseAnyTime(c);
-        if (d) return d;
-      }
-      return null;
+    // Parse *_YYYYMMDD-HHMMSS(-ms)_ from filename
+    const TS_RE = /_(\d{8})-(\d{6})(?:-(\d{3}))?_/;
+    function timeFromFilename(name){
+      const m = TS_RE.exec(name || "");
+      if (!m) return "";
+      const ymd=m[1],hms=m[2],ms=m[3]||"000";
+      const iso = `${ymd.slice(0,4)}-${ymd.slice(4,6)}-${ymd.slice(6,8)}T${hms.slice(0,2)}:${hms.slice(2,4)}:${hms.slice(4,6)}.${ms}`;
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return "";
+      return d.toLocaleString();
     }
 
-    function humanTimeFromProps(p){
-      const d = timeFromProps(p);
-      return d ? d.toLocaleString() : '—';
-    }
-
-    // ===== IMAGE HELPER =====
+    // Build an <img> with fallbacks so thumbnails always try sane paths
     function thumbHTML(p){
       const file = (p.image || "").split("/").pop();
-      const candidates = [];
-
+      let candidates = [];
       if (p.image_url) {
-        // Normalise obvious path fragments
-        let u = p.image_url.replace("./detections/","./")
-                           .replace("detections/","./")
-                           .replace("./images/","./");
+        let u = p.image_url.replace("./detections/","./").replace("detections/","./");
         candidates.push(u);
       }
-      if (file) {
-        candidates.push(IMAGE_ROOT + file);      // ./filename.jpg
-        candidates.push('images/' + file);       // images/filename.jpg
-        candidates.push('detections/' + file);   // detections/filename.jpg
-      }
-      if (!candidates.length) return "";
+      if (file) { candidates.push(IMAGE_ROOT + file); candidates.push(file); }
+      if (candidates.length === 0) return "";
 
       const first = encodeURI(candidates[0]);
       const rest  = candidates.slice(1).map(encodeURI);
-      const onerr = `
+      const handler = `
         (function(img){
           if(!img._alts){ img._alts=${JSON.stringify(rest)}; img._i=0; }
           if(img._i < img._alts.length){ img.src = img._alts[img._i++]; }
           else { img.style.display='none'; }
         })(this)
       `.replace(/\s+/g,' ');
-
-      return `<img class="thumb" src="${first}" alt="annotated" onerror="${onerr}">`;
+      return `<img class="thumb" src="${first}" alt="annotated" onerror="${handler}">`;
     }
 
-    function diameterFromAreaPx(areaPx, px2cm=PX2CM){
-      if (!areaPx || areaPx<=0) return null;
-      const d_px = 2*Math.sqrt(areaPx/Math.PI);
-      return +(d_px*px2cm).toFixed(1);
-    }
-    function colorForDiameter(cm){
-      if (cm >= 60) return "#e53935";
-      if (cm >= 30) return "#fb8c00";
-      return "#43a047";
+    // Weather formatter -> "18°C Clear"
+    function formatWeather(p){
+      // Candidate description fields
+      const descRaw = p.weather_desc ?? p.wx_desc ?? p.conditions ?? p.condition ?? p.wx ?? null;
+
+      // Candidate temperature (°C) fields
+      let temp = p.temp_c ?? p.temperature_c ?? null;
+
+      // If `weather` is a bare number string like "18", use as temp
+      if (temp == null && p.weather != null) {
+        const w = String(p.weather).trim();
+        const n = Number(w);
+        if (!Number.isNaN(n)) temp = n;
+      }
+
+      // If `weather` already looks like descriptive text, keep it and normalize units.
+      if (temp == null && typeof p.weather === "string" && /[a-zA-Z]/.test(p.weather)) {
+        return p.weather
+          .replace(/(\d)\s*c\b/i, '$1°C')
+          .replace(/\s+deg(ree)?s?\s*C?/i, '°C')
+          .replace(/\s+/g,' ')
+          .trim();
+      }
+
+      const t = (temp != null) ? `${Number(temp).toFixed(0)}°C` : (DEFAULT_TEMP_C!=null ? `${DEFAULT_TEMP_C}°C` : null);
+      const d = descRaw ? (String(descRaw).charAt(0).toUpperCase()+String(descRaw).slice(1)) : DEFAULT_WEATHER_DESC;
+
+      return t ? `${t} ${d}` : d; // EXACT format: "18°C Clear"
     }
 
     function popupHTML(p){
-      const weather = (p.weather ?? p.wx ?? DEFAULT_WEATHER);
-      const diameter = (p.diameter_cm != null) ? p.diameter_cm
-                                               : diameterFromAreaPx(Number(p.area_px)||0);
-      const when = humanTimeFromProps(p);
+      const diameter = (p.diameter_cm != null) ? p.diameter_cm : diameterFromAreaPx(Number(p.area_px)||0);
+      const when     = p.time || p.timestamp || timeFromFilename(p.image || "");
 
       const lines = [];
       if (p.image)  lines.push(`<div><b>${p.image}</b></div>`);
       if (diameter) lines.push(`<div><b>Diameter:</b> ${diameter} cm</div>`);
-      lines.push(`<div><b>Weather:</b> ${weather}</div>`);
-      lines.push(`<div><b>Time:</b> ${when}</div>`);
-      if (p.conf!=null) lines.push(`<div>Conf: ${Number(p.conf).toFixed(2)}</div>`);
-      if (p.lat && p.lon) lines.push(`<div>Coords: ${Number(p.lat).toFixed(5)}, ${Number(p.lon).toFixed(5)}</div>`);
-      if (p.alt!=null)    lines.push(`<div>Alt: ${p.alt} m</div>`);
-      if (p.spd!=null)    lines.push(`<div>Speed: ${p.spd} km/h</div>`);
+      lines.push(`<div><b>Weather:</b> ${formatWeather(p)}</div>`);
+      lines.push(`<div><b>Time:</b> ${when || "—"}</div>`);
+      if (p.conf!=null) lines.push(`<div><b>Conf:</b> ${Number(p.conf).toFixed(2)}</div>`);
+      if (p.lat && p.lon) lines.push(`<div><b>Coords:</b> ${Number(p.lat).toFixed(5)}, ${Number(p.lon).toFixed(5)}</div>`);
+      if (p.alt!=null)    lines.push(`<div><b>Alt:</b> ${p.alt} m</div>`);
+      if (p.spd!=null)    lines.push(`<div><b>Speed:</b> ${p.spd} km/h</div>`);
 
       return thumbHTML(p) + `<div class="meta">${lines.join('')}</div>`;
     }
@@ -185,7 +159,7 @@
       return L.circleMarker(latlng, { radius:8, weight:2, color:col, fillColor:col, fillOpacity:0.85, title:(p.status||'unfixed') });
     }
 
-    // ===== MAP =====
+    // ----------- Map setup -----------
     const map = L.map('map', { minZoom:3, maxZoom:19, zoomControl:true });
     L.control.scale({ metric:true, imperial:false }).addTo(map);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'&copy; OpenStreetMap' }).addTo(map);
@@ -210,14 +184,18 @@
         onEachFeature: (f, layer) => {
           count++;
           const p = f.properties || {};
-          if (!p.weather && p.wx) p.weather = p.wx;
 
-          // Backfill diameter from area if needed
+          // If missing explicit time fields, try filename timestamp.
+          if (!p.time && !p.timestamp && p.image) {
+            const t = timeFromFilename(p.image);
+            if (t) p.time = t;
+          }
+          // If missing diameter, derive from area_px.
           if (p.diameter_cm == null && p.area_px != null) {
             p.diameter_cm = diameterFromAreaPx(Number(p.area_px)||0);
           }
 
-          layer.bindPopup(popupHTML(p), { maxWidth: 420 });
+          layer.bindPopup(popupHTML(p), { maxWidth: 460 });
 
           const status = (p.status || 'unfixed').toLowerCase();
           if (status === 'fixed') clusterFixed.addLayer(layer); else clusterUnfixed.addLayer(layer);
@@ -279,9 +257,8 @@
     // Initial load
     loadData().catch(err => {
       console.error(err);
-      alert('Could not load detections.geojson. Make sure it is next to index.html and contains valid GeoJSON point features.');
+      alert('Could not load detections.geojson. Make sure it is next to map.html and contains features.');
     });
   </script>
 </body>
 </html>
-
