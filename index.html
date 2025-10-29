@@ -5,9 +5,9 @@
   <title>Pothole Detections Map</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Leaflet + Cluster -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
@@ -52,11 +52,12 @@
 
   <script>
     // ----------- CONFIG -----------
-    const PX2CM = 0.35;               // pixel -> centimetre scale
-    const DEFAULT_WEATHER = "Clear";  // fallback if none
-    const IMAGE_ROOT = "./";          // images live in same folder as map.html
+    const PX2CM = 0.35;               
+    const DEFAULT_WEATHER = "Clear";  
+    const IMAGE_ROOT = "./images/";   // images folder
 
-    // ----------- Helpers -----------
+    // ----------- Helper Functions -----------
+
     function colorForDiameter(cm){
       if (cm >= 60) return "#e53935";
       if (cm >= 30) return "#fb8c00";
@@ -67,29 +68,44 @@
       const d_px = 2*Math.sqrt(areaPx/Math.PI);
       return +(d_px*px2cm).toFixed(1);
     }
-    // Parse *_YYYYMMDD-HHMMSS(-ms)_ from filename
+
+    // --- Time parsing helpers ---
     const TS_RE = /_(\d{8})-(\d{6})(?:-(\d{3}))?_/;
     function timeFromFilename(name){
       const m = TS_RE.exec(name || "");
       if (!m) return "";
       const ymd=m[1],hms=m[2],ms=m[3]||"000";
-      return `${ymd.slice(0,4)}-${ymd.slice(4,6)}-${ymd.slice(6,8)}T${hms.slice(0,2)}:${hms.slice(2,4)}:${hms.slice(4,6)}.${ms}`;
+      return `${ymd.slice(0,4)}-${ymd.slice(4,6)}-${ymd.slice(6,8)}T${hms.slice(0,2)}:${hms.slice(2,4)}:${hms.slice(4,6)}.${ms}Z`;
     }
-    function humanTime(iso){ try{ return new Date(iso).toLocaleString(); }catch{ return iso||"—"; } }
 
-    // Build a robust <img> with fallbacks so thumbnails always try sane paths
+    function parseDateFlexible(input) {
+      if (!input) return null;
+      const t = String(input).trim();
+      if (/^\d{10}$/.test(t)) return new Date(Number(t) * 1000);
+      if (/^\d{13}$/.test(t)) return new Date(Number(t));
+      const iso = new Date(t);
+      if (!isNaN(iso)) return iso;
+      const alt = Date.parse(t.replace(" ", "T") + "Z");
+      if (!isNaN(alt)) return new Date(alt);
+      return null;
+    }
+
+    function humanTimeFlexible(input) {
+      const d = parseDateFlexible(input);
+      return d ? d.toLocaleString() : '—';
+    }
+
+    // --- Thumbnail builder ---
     function thumbHTML(p){
       const file = (p.image || "").split("/").pop();
-      // Candidate list: provided URL, then ./filename, then filename
       let candidates = [];
       if (p.image_url) {
-        let u = p.image_url.replace("./detections/","./").replace("detections/","./");
+        let u = p.image_url.replace("./detections/","./images/").replace("detections/","images/");
         candidates.push(u);
       }
       if (file) { candidates.push(IMAGE_ROOT + file); candidates.push(file); }
       if (candidates.length === 0) return "";
 
-      // First src + onerror to try the next, hide if all fail
       const first = encodeURI(candidates[0]);
       const rest  = candidates.slice(1).map(encodeURI);
       const handler = `
@@ -106,7 +122,7 @@
       const weather = p.weather || DEFAULT_WEATHER;
       const diameter = (p.diameter_cm != null) ? p.diameter_cm : diameterFromAreaPx(Number(p.area_px)||0);
       const rawTime  = p.time || p.timestamp || timeFromFilename(p.image || "");
-      const when     = humanTime(rawTime);
+      const when     = humanTimeFlexible(rawTime);
 
       const lines = [];
       if (p.image)  lines.push(`<div><b>${p.image}</b></div>`);
@@ -129,7 +145,7 @@
       return L.circleMarker(latlng, { radius:8, weight:2, color:col, fillColor:col, fillOpacity:0.85, title:(p.status||'unfixed') });
     }
 
-    // ----------- Map setup -----------
+    // ----------- Map Setup -----------
     const map = L.map('map', { minZoom:3, maxZoom:19, zoomControl:true });
     L.control.scale({ metric:true, imperial:false }).addTo(map);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'&copy; OpenStreetMap' }).addTo(map);
@@ -224,3 +240,4 @@
   </script>
 </body>
 </html>
+
